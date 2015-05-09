@@ -1,6 +1,10 @@
 #include "AppDelegate.h"
-#include "GameScene.h"
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) 
+#include "HelloWorldScene.h"
+#else
+#include "GameScene.h"
+#endif
 USING_NS_CC;
 
 AppDelegate::AppDelegate() {
@@ -30,7 +34,7 @@ static int register_all_packages()
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
-    srand(time(nullptr));
+    srand(static_cast<int>(time(nullptr)));
     // initialize director
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();
@@ -50,7 +54,11 @@ bool AppDelegate::applicationDidFinishLaunching() {
     register_all_packages();
 
     // create a scene. it's an autorelease object
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+    auto scene = HelloWorld::createScene();
+#else
     auto scene = GameScene::createScene();
+#endif
 
     // run
     director->runWithScene(scene);

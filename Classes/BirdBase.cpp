@@ -11,6 +11,15 @@
 ////////////////////////////////////////////////////////////////////////
 //  BirdBase基类
 ////////////////////////////////////////////////////////////////////////
+BirdBase::BirdBase()
+{
+    _stopMove = false;
+    _birdBody = nullptr;
+    _birdZui = nullptr;
+    _birdChiBang = nullptr;
+    _birdYanJing = nullptr;
+};
+BirdBase::~BirdBase(){};
 BirdBase * BirdBase::createBird(int type)
 {
 

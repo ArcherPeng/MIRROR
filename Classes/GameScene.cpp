@@ -12,6 +12,28 @@
 #include "InfoLayer.h"
 #include <vector>
 
+Scene * GameScene::createScene()
+{
+    auto scene = Scene::create();
+    auto layer = GameScene::create();
+    scene->addChild(layer);
+    return scene;
+}
+GameScene::GameScene()
+{
+    _musicBtn = nullptr;
+    isMusicBtnOut=false;
+    _gameTimes = 0;
+    _jianCePinLv = 0;
+    _playTime = 0;
+    _socre = 0;
+    _totalScore = 0;
+    _nextTimeCreateEnemy = 1.5f;
+    _highScore = 0.0f;
+    _timeLabel = nullptr;
+    _spriteBg = nullptr;
+};
+GameScene::~GameScene(){};
 bool GameScene::init()
 {
     if (!Layer::init())
@@ -19,7 +41,6 @@ bool GameScene::init()
         return false;
     }
 //    std::vector<int> abc;
-    
     auto visableSize = Director::getInstance()->getVisibleSize();
     _timeLabel = Label::createWithSystemFont("0.00s", "Arial", 140);
     _timeLabel->setAnchorPoint(Vec2(0, 1));
@@ -41,16 +62,16 @@ bool GameScene::init()
     bgSp1->setPosition(bgSp->getContentSize().width/2,bgSp->getContentSize().height/2);
     bgSp->addChild(bgSp1);
     bgSp1->setLocalZOrder(10);
-    musicBtn = Button::create("res/ui/musicbtn.png");
-    musicBtn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width+50, Director::getInstance()->getVisibleSize().height-65));
-    musicBtn->setTag(102);
-    musicBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
-    this->addChild(musicBtn);
-    musicBtn->setLocalZOrder(10);
+    _musicBtn = Button::create("res/ui/musicbtn.png");
+    _musicBtn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width+50, Director::getInstance()->getVisibleSize().height-65));
+    _musicBtn->setTag(102);
+    _musicBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
+    this->addChild(_musicBtn);
+    _musicBtn->setLocalZOrder(10);
     bool isMusicOn = UserDefault::getInstance()->getBoolForKey("isMusicOn",true);
     if (!isMusicOn)
     {
-        musicBtn->loadTextureNormal("res/ui/musicbtndis.png");
+        _musicBtn->loadTextureNormal("res/ui/musicbtndis.png");
         
         CocosDenshion::SimpleAudioEngine::getInstance()->setBackgroundMusicVolume(0);
         CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(0);
@@ -83,6 +104,11 @@ bool GameScene::init()
     this->getScheduler()->scheduleUpdate(this,0,false);
 //    void update(float dt);
     return true;
+}
+void GameScene::onEnter()
+{
+    Layer::onEnter();
+    _highScore = UserDefault::getInstance()->getFloatForKey("HighScore",0);
 }
 bool GameScene::checkPengZhuang()
 {
@@ -243,14 +269,14 @@ void GameScene::btnSetCallback(Ref* ref,Widget::TouchEventType eventType)
             CCLOG("btnSetCallback  tag 100");
             if(isMusicBtnOut)
             {
-                musicBtn->runAction(MoveTo::create(0.15, Vec2(Director::getInstance()->getVisibleSize().width+50, btn->getPosition().y)));
+                _musicBtn->runAction(MoveTo::create(0.15, Vec2(Director::getInstance()->getVisibleSize().width+50, btn->getPosition().y)));
                 isMusicBtnOut = false;
             }
             else
             {
                 auto move1 = MoveTo::create(0.15, Vec2(btn->getPosition().x-125, btn->getPosition().y));
                 auto move2 = MoveTo::create(0.05, Vec2(btn->getPosition().x-115, btn->getPosition().y));
-                musicBtn->runAction(Sequence::create(move1,move2, NULL));
+                _musicBtn->runAction(Sequence::create(move1,move2, NULL));
                 isMusicBtnOut = true;
             }
         }
@@ -259,14 +285,14 @@ void GameScene::btnSetCallback(Ref* ref,Widget::TouchEventType eventType)
             bool isMusicOn = UserDefault::getInstance()->getBoolForKey("isMusicOn",true);
             if (isMusicOn)
             {
-                musicBtn->loadTextureNormal("res/ui/musicbtndis.png");
+                _musicBtn->loadTextureNormal("res/ui/musicbtndis.png");
                 UserDefault::getInstance()->setBoolForKey("isMusicOn",false);
                 CocosDenshion::SimpleAudioEngine::getInstance()->setBackgroundMusicVolume(0);
                 CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(0);
             }
             else
             {
-                musicBtn->loadTextureNormal("res/ui/musicbtn.png");
+                _musicBtn->loadTextureNormal("res/ui/musicbtn.png");
                 UserDefault::getInstance()->setBoolForKey("isMusicOn",true);
                 CocosDenshion::SimpleAudioEngine::getInstance()->setBackgroundMusicVolume(1);
                 CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1);
@@ -316,6 +342,30 @@ void GameScene::createFuncCallback()
     btnInfo->setOpacity(0);
     btnInfo->runAction(FadeIn::create(0.8));
     btnInfo->setLocalZOrder(10);
+
+    Label* hightScoreLabel = nullptr;
+    if (_playTime>_highScore)
+    {
+        UserDefault::getInstance()->setFloatForKey("HighScore", _playTime);
+        _highScore=_playTime;
+        hightScoreLabel = Label::createWithSystemFont("Congratulations! \nNEW HIGH SCORE!", "Arial", 70);
+        hightScoreLabel->setTextColor(Color4B(205,85,85,255));
+        hightScoreLabel->setHorizontalAlignment(TextHAlignment::CENTER);
+        hightScoreLabel->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2,Director::getInstance()->getVisibleSize().height/2+30));
+        hightScoreLabel->setAnchorPoint(Vec2(0.5, 0));
+    }
+    else
+    {
+        hightScoreLabel = Label::createWithSystemFont(StringUtils::format("HIGH SCORE: %0.2fs",_highScore), "Arial", 40);
+        hightScoreLabel->setTextColor(Color4B(255,255,255,255));
+        hightScoreLabel->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2,Director::getInstance()->getVisibleSize().height/2-120));
+        hightScoreLabel->setAnchorPoint(Vec2(0.5, 1));
+    }
+    hightScoreLabel->setOpacity(0);
+    hightScoreLabel->runAction(FadeIn::create(0.8));
+    this->addChild(hightScoreLabel);
+    hightScoreLabel->setLocalZOrder(10);
+    
 }
 void GameScene::gameOver()
 {

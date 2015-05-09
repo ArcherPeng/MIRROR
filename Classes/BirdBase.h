@@ -20,16 +20,17 @@ protected:
     Sprite * _birdBody;
     Sprite * _birdZui;
     Sprite * _birdChiBang;
-    virtual Sprite * createBirdBody();
     Sprite * _birdYanJing;
+    virtual Sprite * createBirdBody();
+    
     virtual std::string getBirdTexture();
 public:
     virtual void setStopMove(bool isStopMove);
     virtual bool getStopMove()const;
     static BirdBase * createBird(int type);
     CREATE_FUNC(BirdBase)
-    BirdBase(){};
-    ~BirdBase(){};
+    BirdBase();
+    ~BirdBase();
     virtual void setPosition(const Vec2 &position);
     virtual void setPosition(float x , float y );
     virtual void setPosition(const Vec3 &position);
