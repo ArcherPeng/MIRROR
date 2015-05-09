@@ -41,6 +41,7 @@ bool GameScene::init()
     {
         return false;
     }
+    this->setName("GameScene");
 //    std::vector<int> abc;
     auto visableSize = Director::getInstance()->getVisibleSize();
     _timeLabel = Label::createWithSystemFont("0.00s", "Arial", 140);
@@ -307,30 +308,7 @@ void GameScene::btnSetCallback(Ref* ref,Widget::TouchEventType eventType)
         }
         else if(tag == 103)//暂停
         {
-            this->pause();
-            _pauseBtn->setTouchEnabled(false);
-            auto colorLayer = LayerColor::create(Color4B(0, 0, 0, 120), Director::getInstance()->getVisibleSize().width,Director::getInstance()->getVisibleSize().height);
-            colorLayer->setAnchorPoint(Vec2(0, 0));
-            colorLayer->setPosition(Vec2::ZERO);
-            colorLayer->setLocalZOrder(100);
-            this->addChild(colorLayer);
-            colorLayer->setName("PauseLayer");
-            auto resumeBtn= Button::create("res/ui/resumebtn.png");
-            resumeBtn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/2));
-            resumeBtn->setTag(104);
-            resumeBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
-            colorLayer->addChild(resumeBtn);
-            auto pauseLabel = Label::createWithSystemFont("PAUSE", "Arial", 140);
-            pauseLabel->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/4*3));
-            colorLayer->addChild(pauseLabel);
-            for (Sprite * enemy : _enemy)
-            {
-                enemy->pause();
-            }
-            for (Sprite * life : _life)
-            {
-                life->pause();
-            }
+            this->pauseGame();
             
         }
         else if(tag == 104)//继续
@@ -353,6 +331,33 @@ void GameScene::btnSetCallback(Ref* ref,Widget::TouchEventType eventType)
         }
 //        CCLOG("btnSetCallback");
 //        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("music/d.wav", false);
+    }
+}
+void GameScene::pauseGame()
+{
+    this->pause();
+    _pauseBtn->setTouchEnabled(false);
+    auto colorLayer = LayerColor::create(Color4B(0, 0, 0, 120), Director::getInstance()->getVisibleSize().width,Director::getInstance()->getVisibleSize().height);
+    colorLayer->setAnchorPoint(Vec2(0, 0));
+    colorLayer->setPosition(Vec2::ZERO);
+    colorLayer->setLocalZOrder(100);
+    this->addChild(colorLayer);
+    colorLayer->setName("PauseLayer");
+    auto resumeBtn= Button::create("res/ui/resumebtn.png");
+    resumeBtn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/2));
+    resumeBtn->setTag(104);
+    resumeBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
+    colorLayer->addChild(resumeBtn);
+    auto pauseLabel = Label::createWithSystemFont("PAUSE", "Arial", 140);
+    pauseLabel->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/4*3));
+    colorLayer->addChild(pauseLabel);
+    for (Sprite * enemy : _enemy)
+    {
+        enemy->pause();
+    }
+    for (Sprite * life : _life)
+    {
+        life->pause();
     }
 }
 void GameScene::createFuncCallback()

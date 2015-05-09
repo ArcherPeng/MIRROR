@@ -51,6 +51,7 @@ protected:
     std::vector<int> getSuiJiShu(int num,int baoliu);
     void createFuncCallback();
 public:
+    void pauseGame();
     void update(float dt);
     CREATE_FUNC(GameScene)
     static Scene * createScene();

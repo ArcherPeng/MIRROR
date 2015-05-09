@@ -1,10 +1,10 @@
 #include "AppDelegate.h"
+#include "SimpleAudioEngine.h"
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) 
 #include "HelloWorldScene.h"
-#else
-#include "GameScene.h"
 #endif
+#include "GameScene.h"
 USING_NS_CC;
 
 AppDelegate::AppDelegate() {
@@ -68,8 +68,14 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 // This function will be called when the app is inactive. When comes a phone call,it's be invoked too
 void AppDelegate::applicationDidEnterBackground() {
+    auto runingScene = Director::getInstance()->getRunningScene();
+    auto runingLayer = runingScene->getChildByName("GameScene");
+    if (runingLayer)
+    {
+        dynamic_cast<GameScene*>(runingLayer)->pauseGame();
+    }
     Director::getInstance()->stopAnimation();
-
+   CocosDenshion::SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
     // if you use SimpleAudioEngine, it must be pause
     // SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
 }
@@ -77,7 +83,7 @@ void AppDelegate::applicationDidEnterBackground() {
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground() {
     Director::getInstance()->startAnimation();
-
+    CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
     // if you use SimpleAudioEngine, it must resume here
     // SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
 }
