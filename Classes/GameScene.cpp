@@ -109,9 +109,25 @@ bool GameScene::init()
     listener->onTouchMoved = CC_CALLBACK_2(GameScene::onTouchMoved, this);
     listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
     Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+    
+    auto listenerkeyPad = EventListenerKeyboard::create();
+    listenerkeyPad->onKeyReleased = CC_CALLBACK_2(GameScene::onKeyReleased, this);
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listenerkeyPad, this);
+    
     this->getScheduler()->scheduleUpdate(this,0,false);
 //    void update(float dt);
     return true;
+}
+void GameScene::onKeyReleased(EventKeyboard::KeyCode keycode, cocos2d::Event *event)
+{
+    if (keycode == EventKeyboard::KeyCode::KEY_BACKSPACE)  //返回
+    {
+        this->pauseGame();
+    }
+    else if (keycode == EventKeyboard::KeyCode::KEY_MENU)
+    {
+        
+    }
 }
 void GameScene::onEnter()
 {
@@ -329,6 +345,11 @@ void GameScene::btnSetCallback(Ref* ref,Widget::TouchEventType eventType)
                 life->resume();
             }
         }
+        else if(tag == 105)//暂停
+        {
+            Director::getInstance()->end();
+            
+        }
 //        CCLOG("btnSetCallback");
 //        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("music/d.wav", false);
     }
@@ -348,9 +369,20 @@ void GameScene::pauseGame()
     resumeBtn->setTag(104);
     resumeBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
     colorLayer->addChild(resumeBtn);
+    
+    auto closeBtn= Button::create("res/ui/resumebtn.png");
+    closeBtn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/4));
+    closeBtn->setTag(105);
+    closeBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
+    colorLayer->addChild(closeBtn);
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+
     auto pauseLabel = Label::createWithSystemFont("PAUSE", "Arial", 140);
     pauseLabel->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/4*3));
     colorLayer->addChild(pauseLabel);
+#endif
+    
     for (Sprite * enemy : _enemy)
     {
         enemy->pause();

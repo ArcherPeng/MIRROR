@@ -50,6 +50,7 @@ protected:
     void addLife(int num);
     std::vector<int> getSuiJiShu(int num,int baoliu);
     void createFuncCallback();
+    void onKeyReleased(EventKeyboard::KeyCode keycode, cocos2d::Event *event);
 public:
     void pauseGame();
     void update(float dt);
