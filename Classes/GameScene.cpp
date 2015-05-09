@@ -369,19 +369,19 @@ void GameScene::pauseGame()
     resumeBtn->setTag(104);
     resumeBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
     colorLayer->addChild(resumeBtn);
-    
-    auto closeBtn= Button::create("res/ui/resumebtn.png");
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    auto closeBtn= Button::create("res/ui/closebtn.png");
     closeBtn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/4));
     closeBtn->setTag(105);
     closeBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
     colorLayer->addChild(closeBtn);
+#endif
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 
     auto pauseLabel = Label::createWithSystemFont("PAUSE", "Arial", 140);
     pauseLabel->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/4*3));
     colorLayer->addChild(pauseLabel);
-#endif
+
     
     for (Sprite * enemy : _enemy)
     {
