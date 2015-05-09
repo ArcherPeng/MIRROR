@@ -34,7 +34,7 @@ static int register_all_packages()
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
-    srand(static_cast<int>(time(nullptr)));
+    srand(static_cast<unsigned>(time(nullptr)));
     // initialize director
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();

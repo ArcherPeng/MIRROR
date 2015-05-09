@@ -15,9 +15,6 @@ BirdBase::BirdBase()
 {
     _stopMove = false;
     _birdBody = nullptr;
-    _birdZui = nullptr;
-    _birdChiBang = nullptr;
-    _birdYanJing = nullptr;
 };
 BirdBase::~BirdBase(){};
 BirdBase * BirdBase::createBird(int type)
@@ -52,9 +49,6 @@ bool BirdBase::init()
         return false;
     }
     this->_birdBody = this->createBirdBody();
-    this->_birdZui = Sprite::create("res/bird/zui.png");
-    this->_birdChiBang = Sprite::create("res/bird/chibang.png");
-    this->_birdYanJing = Sprite::create("res/bird/eye.png");
     this->addChild(_birdBody);
     _birdBody->setPosition(Vec2(_birdBody->getContentSize().width/2, _birdBody->getContentSize().height/2));
     this->setContentSize(_birdBody->getContentSize());

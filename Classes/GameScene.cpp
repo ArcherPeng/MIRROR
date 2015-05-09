@@ -21,6 +21,7 @@ Scene * GameScene::createScene()
 }
 GameScene::GameScene()
 {
+    _pauseBtn = nullptr;
     _musicBtn = nullptr;
     isMusicBtnOut=false;
     _gameTimes = 0;
@@ -62,6 +63,12 @@ bool GameScene::init()
     bgSp1->setPosition(bgSp->getContentSize().width/2,bgSp->getContentSize().height/2);
     bgSp->addChild(bgSp1);
     bgSp1->setLocalZOrder(10);
+    _pauseBtn= Button::create("res/ui/pausebtn.png");
+    _pauseBtn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width - _pauseBtn->getContentSize().width/2, Director::getInstance()->getVisibleSize().height-_pauseBtn->getContentSize().height/2));
+    _pauseBtn->setTag(103);
+    _pauseBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
+    this->addChild(_pauseBtn);
+    
     _musicBtn = Button::create("res/ui/musicbtn.png");
     _musicBtn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width+50, Director::getInstance()->getVisibleSize().height-65));
     _musicBtn->setTag(102);
@@ -76,7 +83,7 @@ bool GameScene::init()
         CocosDenshion::SimpleAudioEngine::getInstance()->setBackgroundMusicVolume(0);
         CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(0);
     }
-    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/back.mp3",true);
+    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/back.mp3",true); //NOTE: 在WP8平台，不支持Mp3格式，请转化为wav
     this->_spriteBg = Sprite::create("res/ui/006.png");
     this->_spriteBg->setPosition(Vec2(bgSp->getContentSize().width/2, bgSp->getContentSize().height/2));
     bgSp->addChild(this->_spriteBg);
@@ -298,6 +305,52 @@ void GameScene::btnSetCallback(Ref* ref,Widget::TouchEventType eventType)
                 CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(1);
             }
         }
+        else if(tag == 103)//暂停
+        {
+            this->pause();
+            _pauseBtn->setTouchEnabled(false);
+            auto colorLayer = LayerColor::create(Color4B(0, 0, 0, 120), Director::getInstance()->getVisibleSize().width,Director::getInstance()->getVisibleSize().height);
+            colorLayer->setAnchorPoint(Vec2(0, 0));
+            colorLayer->setPosition(Vec2::ZERO);
+            colorLayer->setLocalZOrder(100);
+            this->addChild(colorLayer);
+            colorLayer->setName("PauseLayer");
+            auto resumeBtn= Button::create("res/ui/resumebtn.png");
+            resumeBtn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/2));
+            resumeBtn->setTag(104);
+            resumeBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
+            colorLayer->addChild(resumeBtn);
+            auto pauseLabel = Label::createWithSystemFont("PAUSE", "Arial", 140);
+            pauseLabel->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/4*3));
+            colorLayer->addChild(pauseLabel);
+            for (Sprite * enemy : _enemy)
+            {
+                enemy->pause();
+            }
+            for (Sprite * life : _life)
+            {
+                life->pause();
+            }
+            
+        }
+        else if(tag == 104)//继续
+        {
+            this->resume();
+            _pauseBtn->setTouchEnabled(true);
+            auto layer = this->getChildByName("PauseLayer");
+            if (layer)
+            {
+                layer->removeFromParentAndCleanup(true);
+            }
+            for (Sprite * enemy : _enemy)
+            {
+                enemy->resume();
+            }
+            for (Sprite * life : _life)
+            {
+                life->resume();
+            }
+        }
 //        CCLOG("btnSetCallback");
 //        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("music/d.wav", false);
     }
@@ -379,6 +432,9 @@ void GameScene::gameOver()
     _timeLabel->runAction(FadeOut::create(0.8));
     CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/die.mp3");//gamestart.wav
     CCLOG("GameOver");
+    
+    _pauseBtn->runAction(FadeOut::create(0.8));
+    _pauseBtn->setTouchEnabled(false);
 }
 float GameScene::getFlyTimeByScore()
 {

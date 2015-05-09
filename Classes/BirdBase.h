@@ -18,9 +18,6 @@ protected:
     virtual bool init();
     bool _stopMove = false;
     Sprite * _birdBody;
-    Sprite * _birdZui;
-    Sprite * _birdChiBang;
-    Sprite * _birdYanJing;
     virtual Sprite * createBirdBody();
     
     virtual std::string getBirdTexture();

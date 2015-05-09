@@ -19,6 +19,7 @@ class GameScene:public Layer
     
 protected:
     Button * _musicBtn;
+    Button * _pauseBtn;
     bool isMusicBtnOut;
     int _gameTimes;
     int _jianCePinLv;
