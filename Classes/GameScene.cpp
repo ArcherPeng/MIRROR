@@ -251,7 +251,7 @@ void GameScene::btnCallback(Ref* ref,Widget::TouchEventType eventType)
 //            {
 //                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(0,20 + enemy->getPositionY())),RemoveSelf::create(), NULL));
 //            }
-            auto big = ScaleTo::create(0.7, 4);
+            auto big = ScaleTo::create(0.7, 2);
             auto fadeOut = FadeOut::create(0.7);
             enemy->runAction(Sequence::create(Spawn::create(big,fadeOut, NULL),RemoveSelf::create(), NULL));
         }
