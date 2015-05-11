@@ -38,6 +38,7 @@ public:
     const Vec2& getPosition() const;
     Vec2 checkPosition(float x , float y,Vec2 vec );
     virtual int getBirdType();
+    virtual Sprite* getBirdSprite()const;
     virtual Vec2 getXiangDuiVec2();
     virtual Vec2 getInitPosition(Vec2 pos);
     

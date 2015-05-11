@@ -180,10 +180,11 @@ bool GameScene::checkPengZhuang()
 //                        this->addLife(lifeNum);
                         return pengZhuangFlag;
                     }
-                    auto big = ScaleTo::create(0.7,1);
+                    auto big = ScaleTo::create(0.7,1.5);
                     auto fadeOut = FadeOut::create(0.7);
                     _birds.at(_birds.size()-1)->setStopMove(true);
-                    _birds.at(_birds.size()-1)->runAction(Sequence::create(Spawn::create(big,fadeOut, NULL),RemoveSelf::create(), NULL));
+                    _birds.at(_birds.size()-1)->getBirdSprite()->runAction(Spawn::create(big,fadeOut, NULL));
+                    _birds.at(_birds.size()-1)->runAction(Sequence::create(DelayTime::create(0.7),RemoveSelf::create(), NULL));
 //                    _birds.at(_birds.size()-1)->removeFromParentAndCleanup(true);
                     
                     _birds.popBack();
@@ -222,6 +223,7 @@ void GameScene::btnCallback(Ref* ref,Widget::TouchEventType eventType)
 {
     if (eventType == Widget::TouchEventType::ENDED)
     {
+        
         auto bg = this->_spriteBg->getParent();
         bg->stopAllActions();
 //        CCLOG("bg->getRotation() %f",bg->getRotation());
@@ -232,23 +234,26 @@ void GameScene::btnCallback(Ref* ref,Widget::TouchEventType eventType)
         bg->runAction(Spawn::create(easeOutAction,easeBigAction, NULL));
         for (auto enemy:_enemy)
         {
-            int randNum = rand()%4;
-            if (randNum==0)
-            {
-                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(750 - enemy->getPositionX(),0)),RemoveSelf::create(), NULL));
-            }
-            else if (randNum==1)
-            {
-                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(enemy->getPositionX() + 20,0)),RemoveSelf::create(), NULL));
-            }
-            else if (randNum==2)
-            {
-                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(0,750 - enemy->getPositionY())),RemoveSelf::create(), NULL));
-            }
-            else if (randNum==3)
-            {
-                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(0,20 + enemy->getPositionY())),RemoveSelf::create(), NULL));
-            }
+//            int randNum = rand()%4;
+//            if (randNum==0)
+//            {
+//                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(750 - enemy->getPositionX(),0)),RemoveSelf::create(), NULL));
+//            }
+//            else if (randNum==1)
+//            {
+//                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(enemy->getPositionX() + 20,0)),RemoveSelf::create(), NULL));
+//            }
+//            else if (randNum==2)
+//            {
+//                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(0,750 - enemy->getPositionY())),RemoveSelf::create(), NULL));
+//            }
+//            else if (randNum==3)
+//            {
+//                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(0,20 + enemy->getPositionY())),RemoveSelf::create(), NULL));
+//            }
+            auto big = ScaleTo::create(0.7, 4);
+            auto fadeOut = FadeOut::create(0.7);
+            enemy->runAction(Sequence::create(Spawn::create(big,fadeOut, NULL),RemoveSelf::create(), NULL));
         }
         _enemy.clear();
         for (auto life:_life)
@@ -267,10 +272,25 @@ void GameScene::btnCallback(Ref* ref,Widget::TouchEventType eventType)
             _birds.at(2)->runAction(Sequence::create(FadeOut::create(2),RemoveSelf::create(), NULL));
             _birds.erase(2);
         }
+        auto big = ScaleTo::create(0.8,1.5);
+        auto fadeOut = FadeOut::create(0.8);
+        _birds.at(0)->getBirdSprite()->runAction(Sequence::create(Spawn::create(big,fadeOut, NULL),CallFunc::create([&](){
+            _birds.at(0)->setPosition(Vec2(50, 50));
+            _birds.at(0)->getBirdSprite()->setOpacity(255);
+            _birds.at(0)->getBirdSprite()->setScale(1);
+        }), NULL));
+        _birds.at(0)->runAction(Sequence::create(DelayTime::create(0.8),MoveTo::create(1.2, Vec2(this->_spriteBg->getContentSize().width/2+100,this->_spriteBg->getContentSize().height/2)), NULL));
         
-        _birds.at(0)->runAction(Sequence::create(MoveTo::create(0.8, Vec2(50,50)),MoveTo::create(1.2, Vec2(this->_spriteBg->getContentSize().width/2+100,this->_spriteBg->getContentSize().height/2)), NULL));
         
-        _birds.at(1)->runAction(Sequence::create(MoveTo::create(0.8, Vec2(680,680)),MoveTo::create(1.2, Vec2(this->_spriteBg->getContentSize().width/2-100,this->_spriteBg->getContentSize().height/2)), NULL));
+        auto big1 = ScaleTo::create(0.8,1.5);
+        auto fadeOut1 = FadeOut::create(0.8);
+        _birds.at(1)->getBirdSprite()->runAction(Sequence::create(Spawn::create(big1,fadeOut1, NULL),CallFunc::create([&](){
+            _birds.at(1)->setPosition(Vec2(680, 680));
+            _birds.at(1)->getBirdSprite()->setOpacity(255);
+            _birds.at(1)->getBirdSprite()->setScale(1);
+        }), NULL));
+        _birds.at(1)->runAction(Sequence::create(DelayTime::create(0.8),MoveTo::create(1.2, Vec2(this->_spriteBg->getContentSize().width/2-100,this->_spriteBg->getContentSize().height/2)), NULL));
+//        _birds.at(1)->runAction(Sequence::create(FadeOut::create(0.8),MoveTo::create(0.01, Vec2(680, 680)),FadeIn::create(0.01),MoveTo::create(1.2, Vec2(this->_spriteBg->getContentSize().width/2-100,this->_spriteBg->getContentSize().height/2)), NULL));
         
         _isGameOver = false;
         _pauseBtn->runAction(Sequence::create(DelayTime::create(2),FadeIn::create(1), NULL));
@@ -316,7 +336,7 @@ void GameScene::btnCallback(Ref* ref,Widget::TouchEventType eventType)
             this->getScheduler()->scheduleUpdate(this,0,false);
             CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/back.mp3",true);
         }),NULL));
-        
+        dynamic_cast<Button*>(ref)->setTouchEnabled(false);
     }
 
 }

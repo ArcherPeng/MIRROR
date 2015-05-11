@@ -38,6 +38,10 @@ BirdBase * BirdBase::createBird(int type)
             break;
     }
 }
+Sprite* BirdBase::getBirdSprite()const
+{
+    return _birdBody;
+}
 int BirdBase::getBirdType()
 {
     return 1;
@@ -52,7 +56,6 @@ bool BirdBase::init()
     this->addChild(_birdBody);
     _birdBody->setPosition(Vec2(_birdBody->getContentSize().width/2, _birdBody->getContentSize().height/2));
     this->setContentSize(_birdBody->getContentSize());
-    
     return true;
 }
 
