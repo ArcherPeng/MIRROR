@@ -70,12 +70,15 @@ bool AppDelegate::applicationDidFinishLaunching() {
 void AppDelegate::applicationDidEnterBackground() {
     auto runingScene = Director::getInstance()->getRunningScene();
     auto runingLayer = runingScene->getChildByName("GameScene");
-    if (runingLayer)
+    if (runingLayer &&!dynamic_cast<GameScene*>(runingLayer)->isGameOver())
     {
         dynamic_cast<GameScene*>(runingLayer)->pauseGame();
     }
+    else
+    {
+        CocosDenshion::SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+    }
     Director::getInstance()->stopAnimation();
-   CocosDenshion::SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
     // if you use SimpleAudioEngine, it must be pause
     // SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
 }
@@ -83,7 +86,16 @@ void AppDelegate::applicationDidEnterBackground() {
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground() {
     Director::getInstance()->startAnimation();
-    CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+    auto runingScene = Director::getInstance()->getRunningScene();
+    auto runingLayer = runingScene->getChildByName("GameScene");
+    if (runingLayer&&!dynamic_cast<GameScene*>(runingLayer)->isGameOver())
+    {
+    }
+    else
+    {
+        CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+    }
+
     // if you use SimpleAudioEngine, it must resume here
     // SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
 }

@@ -21,6 +21,7 @@ Scene * GameScene::createScene()
 }
 GameScene::GameScene()
 {
+    _isGameOver = false;
     _pauseBtn = nullptr;
     _musicBtn = nullptr;
     isMusicBtnOut=false;
@@ -329,6 +330,7 @@ void GameScene::btnSetCallback(Ref* ref,Widget::TouchEventType eventType)
         }
         else if(tag == 104)//继续
         {
+            CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
             this->resume();
             _pauseBtn->setTouchEnabled(true);
             auto layer = this->getChildByName("PauseLayer");
@@ -356,6 +358,7 @@ void GameScene::btnSetCallback(Ref* ref,Widget::TouchEventType eventType)
 }
 void GameScene::pauseGame()
 {
+    CocosDenshion::SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
     this->pause();
     _pauseBtn->setTouchEnabled(false);
     auto colorLayer = LayerColor::create(Color4B(0, 0, 0, 120), Director::getInstance()->getVisibleSize().width,Director::getInstance()->getVisibleSize().height);
@@ -457,8 +460,13 @@ void GameScene::createFuncCallback()
     hightScoreLabel->setLocalZOrder(10);
     
 }
+bool GameScene::isGameOver()
+{
+    return _isGameOver;
+}
 void GameScene::gameOver()
 {
+    _isGameOver = true;
     auto bg = this->_spriteBg->getParent();
     auto rotateAction = RotateBy::create(8, -120);
     auto easeOutAction = EaseOut::create(rotateAction, 1.6);

@@ -18,6 +18,7 @@ class GameScene:public Layer
 {
     
 protected:
+    bool _isGameOver;
     Button * _musicBtn;
     Button * _pauseBtn;
     bool isMusicBtnOut;
@@ -58,6 +59,7 @@ public:
     static Scene * createScene();
     GameScene();
     ~GameScene();
+    bool isGameOver();
 };
 
 
