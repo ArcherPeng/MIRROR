@@ -72,6 +72,18 @@ void BirdBase::setPosition(const Vec3 &position)
 {
     this->setPosition(position.x, position.y);
 }
+Vec3 BirdBase::getPosition3D()const
+{
+    auto vecP = Layer::getPosition();
+    float x = vecP.x+_birdBody->getContentSize().width/2;
+    float y = vecP.y+_birdBody->getContentSize().height/2;
+    return Vec3(x, y,0);
+}
+void BirdBase::setPosition3D(const Vec3 & position)
+{
+//    CCLOG("setPosition3D  %f  %f",position.x,position.y);
+    this->setPosition(position);
+}
 const Vec2& BirdBase::getPosition() const
 {
     auto vecP = Layer::getPosition();

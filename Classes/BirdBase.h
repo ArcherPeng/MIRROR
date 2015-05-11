@@ -28,9 +28,12 @@ public:
     CREATE_FUNC(BirdBase)
     BirdBase();
     ~BirdBase();
+//    Sprite * getBirdSprite
     virtual void setPosition(const Vec2 &position);
     virtual void setPosition(float x , float y );
     virtual void setPosition(const Vec3 &position);
+    virtual void setPosition3D(const Vec3 & position);
+    virtual Vec3 getPosition3D()const;
     virtual void setPositionAsVec2(float x , float y );
     const Vec2& getPosition() const;
     Vec2 checkPosition(float x , float y,Vec2 vec );

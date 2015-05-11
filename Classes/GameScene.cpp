@@ -222,19 +222,99 @@ void GameScene::btnCallback(Ref* ref,Widget::TouchEventType eventType)
 {
     if (eventType == Widget::TouchEventType::ENDED)
     {
-        CCLOG("11");
         auto bg = this->_spriteBg->getParent();
-        auto rotateAction = RotateBy::create(2.5, 360);
+        bg->stopAllActions();
+//        CCLOG("bg->getRotation() %f",bg->getRotation());
+        auto rotateAction = RotateBy::create(2.5, 360-bg->getRotation());
         auto easeOutAction = EaseIn::create(rotateAction, 3);
         auto scaleAction = ScaleTo::create(2.5, 1);
         auto easeBigAction = EaseIn::create(scaleAction, 3);
         bg->runAction(Spawn::create(easeOutAction,easeBigAction, NULL));
+        for (auto enemy:_enemy)
+        {
+            int randNum = rand()%4;
+            if (randNum==0)
+            {
+                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(750 - enemy->getPositionX(),0)),RemoveSelf::create(), NULL));
+            }
+            else if (randNum==1)
+            {
+                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(enemy->getPositionX() + 20,0)),RemoveSelf::create(), NULL));
+            }
+            else if (randNum==2)
+            {
+                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(0,750 - enemy->getPositionY())),RemoveSelf::create(), NULL));
+            }
+            else if (randNum==3)
+            {
+                enemy->runAction(Sequence::create(MoveBy::create(2, Vec2(0,20 + enemy->getPositionY())),RemoveSelf::create(), NULL));
+            }
+        }
+        _enemy.clear();
+        for (auto life:_life)
+        {
+            life->runAction(Sequence::create(FadeOut::create(2),RemoveSelf::create(), NULL));
+        }
+        _life.clear();
+        //其实下边这个没啥用。死了可能还大于2个白块
+        if (_birds.size()>3)
+        {
+            _birds.at(3)->runAction(Sequence::create(FadeOut::create(2),RemoveSelf::create(), NULL));
+            _birds.erase(3);
+        }
+        if (_birds.size()>2)
+        {
+            _birds.at(2)->runAction(Sequence::create(FadeOut::create(2),RemoveSelf::create(), NULL));
+            _birds.erase(2);
+        }
+        
+        _birds.at(0)->runAction(Sequence::create(MoveTo::create(0.8, Vec2(50,50)),MoveTo::create(1.2, Vec2(this->_spriteBg->getContentSize().width/2+100,this->_spriteBg->getContentSize().height/2)), NULL));
+        
+        _birds.at(1)->runAction(Sequence::create(MoveTo::create(0.8, Vec2(680,680)),MoveTo::create(1.2, Vec2(this->_spriteBg->getContentSize().width/2-100,this->_spriteBg->getContentSize().height/2)), NULL));
+        
+        _isGameOver = false;
+        _pauseBtn->runAction(Sequence::create(DelayTime::create(2),FadeIn::create(1), NULL));
+        this->getChildByName("hightScoreLabel")->runAction(Sequence::create(DelayTime::create(2),FadeOut::create(1),RemoveSelf::create(), NULL));
+        this->getChildByName("info")->runAction(Sequence::create(DelayTime::create(2),FadeOut::create(1),RemoveSelf::create(), NULL));
+        this->getChildByName("btnSet")->runAction(Sequence::create(DelayTime::create(2),FadeOut::create(1),RemoveSelf::create(), NULL));
+        this->getChildByName("gameover")->runAction(Sequence::create(DelayTime::create(2),FadeOut::create(1),RemoveSelf::create(), NULL));
+        this->getChildByName("restart")->runAction(Sequence::create(DelayTime::create(2),FadeOut::create(1),RemoveSelf::create(), NULL));
+        _musicBtn->runAction(MoveTo::create(0.15, Vec2(Director::getInstance()->getVisibleSize().width+50, Director::getInstance()->getVisibleSize().height-65)));
+        isMusicBtnOut = false;
+        dynamic_cast<Button*>(this->getChildByName("btnSet"))->runAction(Sequence::create(FadeOut::create(2),RemoveSelf::create(), NULL));
+        _gameTimes = 0;
+        _jianCePinLv = 0;
+        _playTime = 0;
+        _socre = 0;
+        _totalScore = 0;
+        _nextTimeCreateEnemy = 1.5f;
+        _timeLabel->setString("0.00s");
+        _timeLabel->setPosition(15,Director::getInstance()->getVisibleSize().height - 10);
+        _timeLabel->setAnchorPoint(Vec2(0, 1));
+        _timeLabel->setTextColor(Color4B(252,233,219,255));
+        _timeLabel->setLocalZOrder(10);
+        
+        
+
+//        _timeLabel 
+//        _spriteBg = nullptr;
         
         CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/gamestart.wav");//gamestart.wav
-        this->runAction(Sequence::create(DelayTime::create(2),CallFunc::create([](){
-            auto scene = GameScene::createScene();
-            auto actionScene = TransitionCrossFade::create(0.5, scene);
-            Director::getInstance()->replaceScene(actionScene);
+        this->runAction(Sequence::create(DelayTime::create(2.5),CallFunc::create([&](){
+//            auto scene = GameScene::createScene();
+//            auto actionScene = TransitionCrossFade::create(0.5, scene);
+//            Director::getInstance()->replaceScene(actionScene);
+            _pauseBtn->setTouchEnabled(true);
+            this->_spriteBg->getParent()->setRotation(0);
+            
+            auto listener = EventListenerTouchOneByOne::create();
+            listener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this);
+            listener->onTouchMoved = CC_CALLBACK_2(GameScene::onTouchMoved, this);
+            listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
+            Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+
+            this->getScheduler()->scheduleUpdate(this,0,false);
+            CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/back.mp3",true);
         }),NULL));
         
     }
@@ -398,6 +478,7 @@ void GameScene::pauseGame()
 void GameScene::createFuncCallback()
 {
     auto btn = Button::create("res/ui/restart.png");
+    btn->setName("restart");
     btn->addTouchEventListener(CC_CALLBACK_2(GameScene::btnCallback, this));
     btn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/4));
     this->addChild(btn);
@@ -407,14 +488,17 @@ void GameScene::createFuncCallback()
     
     auto gameOverSp = Sprite::create("res/ui/gameover.png");
     gameOverSp->setPosition(Director::getInstance()->getVisibleSize().width/2, Director::getInstance()->getVisibleSize().height/2-50);
+    gameOverSp->setName("gameover");
     gameOverSp->setOpacity(0);
     gameOverSp->runAction(FadeIn::create(0.8));
     gameOverSp->setLocalZOrder(10);
     this->addChild(gameOverSp);
     
     auto btnSet = Button::create("res/ui/setting.png");
+    btnSet->setName("setting");
     btnSet->addTouchEventListener(CC_CALLBACK_2(GameScene::btnSetCallback, this));
     btnSet->setPosition(Vec2(Director::getInstance()->getVisibleSize().width - 65, Director::getInstance()->getVisibleSize().height-65));
+    btnSet->setName("btnSet");
     btnSet->setTag(101);
     this->addChild(btnSet);
     btnSet->setOpacity(0);
@@ -435,6 +519,7 @@ void GameScene::createFuncCallback()
     btnInfo->setOpacity(0);
     btnInfo->runAction(FadeIn::create(0.8));
     btnInfo->setLocalZOrder(10);
+    btnInfo->setName("info");
 
     Label* hightScoreLabel = nullptr;
     if (_playTime>_highScore)
@@ -458,6 +543,7 @@ void GameScene::createFuncCallback()
     hightScoreLabel->runAction(FadeIn::create(0.8));
     this->addChild(hightScoreLabel);
     hightScoreLabel->setLocalZOrder(10);
+    hightScoreLabel->setName("hightScoreLabel");
     
 }
 bool GameScene::isGameOver()
@@ -546,6 +632,7 @@ int GameScene::getGameLevelByScore()
 }
 std::vector<int> GameScene::getSuiJiShu(int num,int baoliu)
 {
+//    CCLOG("num %d baoliu %d",num,baoliu);
     int arr[22];
     for (int i = 0,j=0 ; i<23; ++i)
     {
@@ -680,7 +767,7 @@ void GameScene::createLife()
                                          _life.eraseObject(dynamic_cast<Sprite *>(node));
                                      });
         auto removeSelf = RemoveSelf::create();
-        sp->runAction(Sequence::create(fadeInAction,delAction,shanAction,call,removeSelf, NULL));
+        sp->runAction(Sequence::create(fadeInAction,delAction,shanAction,DelayTime::create(0.5),call,removeSelf, NULL));
     }
 }
 void GameScene::update(float dt)
