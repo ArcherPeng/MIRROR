@@ -14,6 +14,9 @@ USING_NS_CC;
 class InfoLayer:public Layer
 {
 protected:
+    Vector<Label*> _infoLabels;
+    Vector<Label*> _thankLabels;
+    int _step;
     virtual bool init();
     bool onTouchBegan(Touch* touch, Event*event);
     void onTouchMoved(Touch* touch, Event*event);

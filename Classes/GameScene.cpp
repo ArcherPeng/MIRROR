@@ -294,11 +294,19 @@ void GameScene::btnCallback(Ref* ref,Widget::TouchEventType eventType)
         
         _isGameOver = false;
         _pauseBtn->runAction(Sequence::create(DelayTime::create(2),FadeIn::create(1), NULL));
-        this->getChildByName("hightScoreLabel")->runAction(Sequence::create(DelayTime::create(2),FadeOut::create(1),RemoveSelf::create(), NULL));
-        this->getChildByName("info")->runAction(Sequence::create(DelayTime::create(2),FadeOut::create(1),RemoveSelf::create(), NULL));
-        this->getChildByName("btnSet")->runAction(Sequence::create(DelayTime::create(2),FadeOut::create(1),RemoveSelf::create(), NULL));
-        this->getChildByName("gameover")->runAction(Sequence::create(DelayTime::create(2),FadeOut::create(1),RemoveSelf::create(), NULL));
-        this->getChildByName("restart")->runAction(Sequence::create(DelayTime::create(2),FadeOut::create(1),RemoveSelf::create(), NULL));
+        this->getChildByName("hightScoreLabel")->runAction(Sequence::create(DelayTime::create(0.5),FadeOut::create(1),RemoveSelf::create(), NULL));
+        this->getChildByName("info")->runAction(Sequence::create(DelayTime::create(0.5),FadeOut::create(1),RemoveSelf::create(), NULL));
+        this->getChildByName("btnSet")->runAction(Sequence::create(DelayTime::create(0.5),FadeOut::create(1),RemoveSelf::create(), NULL));
+        this->getChildByName("gameover")->runAction(Sequence::create(DelayTime::create(0.5),FadeOut::create(1),RemoveSelf::create(), NULL));
+        this->getChildByName("restart")->runAction(Sequence::create(DelayTime::create(0.5),FadeOut::create(1),RemoveSelf::create(), NULL));
+        _timeLabel->runAction(Sequence::create(DelayTime::create(0.5),FadeOut::create(1),CallFunc::create([&](){
+            _timeLabel->setString("0.00s");
+            _timeLabel->setPosition(15,Director::getInstance()->getVisibleSize().height - 10);
+            _timeLabel->setAnchorPoint(Vec2(0, 1));
+            _timeLabel->setTextColor(Color4B(252,233,219,255));
+            _timeLabel->setLocalZOrder(10);
+            _timeLabel->runAction(Sequence::create(DelayTime::create(1),FadeIn::create(1), NULL));
+        }), NULL));
         _musicBtn->runAction(MoveTo::create(0.15, Vec2(Director::getInstance()->getVisibleSize().width+50, Director::getInstance()->getVisibleSize().height-65)));
         isMusicBtnOut = false;
         dynamic_cast<Button*>(this->getChildByName("btnSet"))->runAction(Sequence::create(FadeOut::create(2),RemoveSelf::create(), NULL));
@@ -308,11 +316,7 @@ void GameScene::btnCallback(Ref* ref,Widget::TouchEventType eventType)
         _socre = 0;
         _totalScore = 0;
         _nextTimeCreateEnemy = 1.5f;
-        _timeLabel->setString("0.00s");
-        _timeLabel->setPosition(15,Director::getInstance()->getVisibleSize().height - 10);
-        _timeLabel->setAnchorPoint(Vec2(0, 1));
-        _timeLabel->setTextColor(Color4B(252,233,219,255));
-        _timeLabel->setLocalZOrder(10);
+        
         
         
 
