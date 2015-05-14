@@ -5,7 +5,7 @@
 //  Created by ArcherPeng on 15/4/29.
 //
 //
-
+// Magic. Do not touch.
 #include "GameScene.h"
 //#include "cocos-ext.h"
 #include "SimpleAudioEngine.h"
