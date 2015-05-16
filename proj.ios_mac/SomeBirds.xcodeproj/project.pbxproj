@@ -59,6 +59,8 @@
 		D44C620E132DFF430009C878 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D44C620D132DFF430009C878 /* AVFoundation.framework */; };
 		D44C6210132DFF4E0009C878 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D44C620F132DFF4E0009C878 /* AudioToolbox.framework */; };
 		D6B0611B1803AB670077942B /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6B0611A1803AB670077942B /* CoreMotion.framework */; };
+		E50639751B0782E300C28EC6 /* shaders in Resources */ = {isa = PBXBuildFile; fileRef = E50639741B0782E300C28EC6 /* shaders */; };
+		E50639761B0782E300C28EC6 /* shaders in Resources */ = {isa = PBXBuildFile; fileRef = E50639741B0782E300C28EC6 /* shaders */; };
 		E5206D411AF788AD00D34443 /* music in Resources */ = {isa = PBXBuildFile; fileRef = E5206D401AF788AD00D34443 /* music */; };
 		E5206D421AF788AD00D34443 /* music in Resources */ = {isa = PBXBuildFile; fileRef = E5206D401AF788AD00D34443 /* music */; };
 		E53431CF1AF8802A00047F8C /* 100.png in Resources */ = {isa = PBXBuildFile; fileRef = E53431C11AF8802A00047F8C /* 100.png */; };
@@ -183,6 +185,7 @@
 		D44C620D132DFF430009C878 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		D44C620F132DFF4E0009C878 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		D6B0611A1803AB670077942B /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/CoreMotion.framework; sourceTree = DEVELOPER_DIR; };
+		E50639741B0782E300C28EC6 /* shaders */ = {isa = PBXFileReference; lastKnownFileType = folder; path = shaders; sourceTree = "<group>"; };
 		E5206D401AF788AD00D34443 /* music */ = {isa = PBXFileReference; lastKnownFileType = folder; path = music; sourceTree = "<group>"; };
 		E53431C11AF8802A00047F8C /* 100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 100.png; sourceTree = "<group>"; };
 		E53431C21AF8802A00047F8C /* 114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 114.png; sourceTree = "<group>"; };
@@ -321,6 +324,7 @@
 		46880B7519C43A67006E1F66 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				E50639741B0782E300C28EC6 /* shaders */,
 				E53431C01AF8802A00047F8C /* icon */,
 				E5206D401AF788AD00D34443 /* music */,
 				3EACC98E19EE6D4300EB3C5E /* res */,
@@ -543,6 +547,7 @@
 				50EF629617ECD46A001EB2F8 /* Icon-40.png in Resources */,
 				5087E78217EB970100C73F5D /* Icon-144.png in Resources */,
 				3EACC98F19EE6D4300EB3C5E /* res in Resources */,
+				E50639751B0782E300C28EC6 /* shaders in Resources */,
 				50EF629817ECD46A001EB2F8 /* Icon-80.png in Resources */,
 				E53431E91AF8802A00047F8C /* 80.png in Resources */,
 				5087E78417EB970100C73F5D /* Icon-57.png in Resources */,
@@ -571,6 +576,7 @@
 				E53431EA1AF8802A00047F8C /* 80.png in Resources */,
 				E53431D61AF8802A00047F8C /* 144.png in Resources */,
 				E5206D421AF788AD00D34443 /* music in Resources */,
+				E50639761B0782E300C28EC6 /* shaders in Resources */,
 				E53431D01AF8802A00047F8C /* 100.png in Resources */,
 				E53431DE1AF8802A00047F8C /* 50.png in Resources */,
 			);

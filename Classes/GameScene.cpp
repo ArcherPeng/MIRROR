@@ -34,6 +34,10 @@ GameScene::GameScene()
     _highScore = 0.0f;
     _timeLabel = nullptr;
     _spriteBg = nullptr;
+    _bgUP = nullptr;
+    _sampleNum = 0.0f;
+    _blurRadius = 0.0f;
+    _gLProgramState = nullptr;
 };
 GameScene::~GameScene(){};
 bool GameScene::init()
@@ -51,7 +55,6 @@ bool GameScene::init()
     _timeLabel->setPosition(15,visableSize.height - 10);
     this->addChild(_timeLabel);
     _timeLabel->setLocalZOrder(10);
-    
     auto bgSp = Sprite::create("res/ui/005.png");
     bgSp->setPosition(visableSize.width/2,visableSize.height/2);
     this->addChild(bgSp);
@@ -61,10 +64,11 @@ bool GameScene::init()
     bgSp1 = Sprite::create("res/ui/005.png");
     bgSp1->setPosition(bgSp->getContentSize().width+bgSp->getContentSize().width/2,bgSp->getContentSize().height/2);
     bgSp->addChild(bgSp1);
-    bgSp1 = Sprite::create("res/ui/bgup.png");
-    bgSp1->setPosition(bgSp->getContentSize().width/2,bgSp->getContentSize().height/2);
-    bgSp->addChild(bgSp1);
-    bgSp1->setLocalZOrder(10);
+    
+    _bgUP = Sprite::create("res/ui/bgup.png");
+    _bgUP->setPosition(bgSp->getContentSize().width/2,bgSp->getContentSize().height/2);
+    bgSp->addChild(_bgUP);
+    _bgUP->setLocalZOrder(10);
     _pauseBtn= Button::create("res/ui/pausebtn.png");
     _pauseBtn->setPosition(Vec2(Director::getInstance()->getVisibleSize().width - _pauseBtn->getContentSize().width/2, Director::getInstance()->getVisibleSize().height-_pauseBtn->getContentSize().height/2));
     _pauseBtn->setTag(103);
@@ -129,6 +133,35 @@ void GameScene::onKeyReleased(EventKeyboard::KeyCode keycode, cocos2d::Event *ev
     {
         
     }
+}
+void GameScene::blurSchluder(float dt)
+{
+    _blurRadius += (25*0.8)/20;
+    _sampleNum += (11*0.6)/20;
+//    getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
+//    getGLProgramState()->setUniformFloat("sampleNum", 7.0f);
+    for (auto bird:_birds)
+    {
+        bird->getBirdSprite()->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
+        bird->getBirdSprite()->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
+    }
+    for (auto life:_life)
+    {
+        life->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
+        life->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
+    }
+    _bgUP->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
+    _bgUP->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
+    for (auto enemy:_enemy)
+    {
+        enemy->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
+        enemy->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
+    }
+}
+void GameScene::blurBackSchluder(float dt)
+{
+    _blurRadius -= (25*0.8)/60;
+    _sampleNum -= (11*0.6)/60;
 }
 void GameScene::onEnter()
 {
@@ -574,6 +607,26 @@ bool GameScene::isGameOver()
 {
     return _isGameOver;
 }
+void GameScene::setGLProgramBlur(Node * node)
+{
+//    node->set
+    Sprite * sp = dynamic_cast<Sprite*>(node);
+    GLchar * fragSource = (GLchar*) String::createWithContentsOfFile(
+                                                                     FileUtils::getInstance()->fullPathForFilename("shaders/example_Blur.fsh").c_str())->getCString();
+    auto program = GLProgram::createWithByteArrays(ccPositionTextureColor_noMVP_vert, fragSource);
+    
+    auto glProgramState = GLProgramState::getOrCreateWithGLProgram(program);
+    sp->setGLProgramState(glProgramState);
+    
+    auto size = sp->getTexture()->getContentSizeInPixels();
+    sp->getGLProgramState()->setUniformVec2("resolution", size);
+    sp->getGLProgramState()->setUniformFloat("blurRadius", 0);
+    sp->getGLProgramState()->setUniformFloat("sampleNum",0);
+}
+void GameScene::setGLProgramBack(Node * node)
+{
+    node->setGLProgramState(_gLProgramState);
+}
 void GameScene::gameOver()
 {
     _isGameOver = true;
@@ -587,9 +640,27 @@ void GameScene::gameOver()
     _timeLabel->runAction(FadeOut::create(0.8));
     CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/die.mp3");//gamestart.wav
     CCLOG("GameOver");
+    //GameScene::blurSchluder
+//    for (auto bird:_birds)
+//    {
+//        this->setGLProgramBlur(bird->getBirdSprite());
+//    }
+//    for (auto life:_life)
+//    {
+//        this->setGLProgramBlur(life);
+//    }
+//    this->setGLProgramBlur(_bgUP);
+//    for (auto enemy:_enemy)
+//    {
+//        this->setGLProgramBlur(enemy);
+//    }
     
+//    this->getScheduler()->schedule(schedule_selector(GameScene::blurSchluder),this,0.1, 20,0,false);
+//    _gLProgramState = _bgUP->getGLProgramState();
     _pauseBtn->runAction(FadeOut::create(0.8));
     _pauseBtn->setTouchEnabled(false);
+    
+    
 }
 float GameScene::getFlyTimeByScore()
 {

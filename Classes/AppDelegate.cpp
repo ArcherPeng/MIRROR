@@ -52,7 +52,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
     director->setAnimationInterval(1.0 / 60);
     
     register_all_packages();
-
     // create a scene. it's an autorelease object
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
     auto scene = HelloWorld::createScene();
@@ -62,7 +61,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // run
     director->runWithScene(scene);
-
     return true;
 }
 

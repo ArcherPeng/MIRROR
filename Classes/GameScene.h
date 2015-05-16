@@ -29,6 +29,10 @@ protected:
     int _socre;
     int _totalScore;
     float _nextTimeCreateEnemy;
+    Sprite * _bgUP;
+    float _sampleNum;
+    float _blurRadius;
+    GLProgramState * _gLProgramState;
     Label * _timeLabel ;
     Sprite * _spriteBg;
     Vector<BirdBase *> _birds;
@@ -52,14 +56,19 @@ protected:
     std::vector<int> getSuiJiShu(int num,int baoliu);
     void createFuncCallback();
     void onKeyReleased(EventKeyboard::KeyCode keycode, cocos2d::Event *event);
+    void setGLProgramBlur(Node *);
+    void setGLProgramBack(Node *);
 public:
     void pauseGame();
     void update(float dt);
+    void blurSchluder(float dt);
+    void blurBackSchluder(float dt);
     CREATE_FUNC(GameScene)
     static Scene * createScene();
     GameScene();
     ~GameScene();
     bool isGameOver();
+    
 };
 
 
