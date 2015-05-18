@@ -16,7 +16,7 @@ class BirdBase:public Layer
     
 protected:
     virtual bool init();
-    bool _stopMove = false;
+    bool _stopMove;
     Sprite * _birdBody;
     virtual Sprite * createBirdBody();
     

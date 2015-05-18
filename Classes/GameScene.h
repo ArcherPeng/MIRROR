@@ -56,13 +56,13 @@ protected:
     std::vector<int> getSuiJiShu(int num,int baoliu);
     void createFuncCallback();
     void onKeyReleased(EventKeyboard::KeyCode keycode, cocos2d::Event *event);
-    void setGLProgramBlur(Node *);
-    void setGLProgramBack(Node *);
+//    void setGLProgramBlur(Node *); //不加模糊效果了 不好看
+//    void setGLProgramBack(Node *);
 public:
     void pauseGame();
     void update(float dt);
-    void blurSchluder(float dt);
-    void blurBackSchluder(float dt);
+//    void blurSchluder(float dt);
+//    void blurBackSchluder(float dt);
     CREATE_FUNC(GameScene)
     static Scene * createScene();
     GameScene();

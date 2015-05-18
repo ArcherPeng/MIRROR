@@ -1,7 +1,7 @@
 #include "AppDelegate.h"
 #include "SimpleAudioEngine.h"
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) ||(CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
 #include "HelloWorldScene.h"
 #endif
 #include "GameScene.h"
@@ -53,7 +53,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     
     register_all_packages();
     // create a scene. it's an autorelease object
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)||(CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
     auto scene = HelloWorld::createScene();
 #else
     auto scene = GameScene::createScene();

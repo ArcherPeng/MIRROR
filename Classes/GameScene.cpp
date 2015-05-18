@@ -89,8 +89,14 @@ bool GameScene::init()
         CocosDenshion::SimpleAudioEngine::getInstance()->setBackgroundMusicVolume(0);
         CocosDenshion::SimpleAudioEngine::getInstance()->setEffectsVolume(0);
     }
-    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/back.mp3",true); //NOTE: 在WP8平台，不支持Mp3格式，请转化为wav
-    this->_spriteBg = Sprite::create("res/ui/006.png");
+    
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
+    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/back.wav",true);
+#else
+    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/back.mp3",true);
+#endif
+        this->_spriteBg = Sprite::create("res/ui/006.png");
     this->_spriteBg->setPosition(Vec2(bgSp->getContentSize().width/2, bgSp->getContentSize().height/2));
     bgSp->addChild(this->_spriteBg);
     auto bird = BirdBase::createBird(1);
@@ -134,35 +140,35 @@ void GameScene::onKeyReleased(EventKeyboard::KeyCode keycode, cocos2d::Event *ev
         
     }
 }
-void GameScene::blurSchluder(float dt)
-{
-    _blurRadius += (25*0.8)/20;
-    _sampleNum += (11*0.6)/20;
-//    getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
-//    getGLProgramState()->setUniformFloat("sampleNum", 7.0f);
-    for (auto bird:_birds)
-    {
-        bird->getBirdSprite()->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
-        bird->getBirdSprite()->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
-    }
-    for (auto life:_life)
-    {
-        life->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
-        life->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
-    }
-    _bgUP->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
-    _bgUP->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
-    for (auto enemy:_enemy)
-    {
-        enemy->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
-        enemy->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
-    }
-}
-void GameScene::blurBackSchluder(float dt)
-{
-    _blurRadius -= (25*0.8)/60;
-    _sampleNum -= (11*0.6)/60;
-}
+//void GameScene::blurSchluder(float dt)
+//{
+//    _blurRadius += (25*0.8)/20;
+//    _sampleNum += (11*0.6)/20;
+////    getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
+////    getGLProgramState()->setUniformFloat("sampleNum", 7.0f);
+//    for (auto bird:_birds)
+//    {
+//        bird->getBirdSprite()->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
+//        bird->getBirdSprite()->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
+//    }
+//    for (auto life:_life)
+//    {
+//        life->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
+//        life->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
+//    }
+//    _bgUP->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
+//    _bgUP->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
+//    for (auto enemy:_enemy)
+//    {
+//        enemy->getGLProgramState()->setUniformFloat("blurRadius", _blurRadius);
+//        enemy->getGLProgramState()->setUniformFloat("sampleNum", _sampleNum);
+//    }
+//}
+//void GameScene::blurBackSchluder(float dt)
+//{
+//    _blurRadius -= (25*0.8)/60;
+//    _sampleNum -= (11*0.6)/60;
+//}
 void GameScene::onEnter()
 {
     Layer::onEnter();
@@ -371,7 +377,11 @@ void GameScene::btnCallback(Ref* ref,Widget::TouchEventType eventType)
             Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
             this->getScheduler()->scheduleUpdate(this,0,false);
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
+            CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/back.wav",true);
+#else
             CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/back.mp3",true);
+#endif
         }),NULL));
         dynamic_cast<Button*>(ref)->setTouchEnabled(false);
     }
@@ -381,7 +391,11 @@ void GameScene::addLife(int num)
 {
     if (num>0)
     {
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
+        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("music/levelup.wav");
+#else
         CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("music/levelup.mp3");
+#endif
     }
     if (num == 0 || _birds.size()>= 4)
     {
@@ -467,22 +481,54 @@ void GameScene::btnSetCallback(Ref* ref,Widget::TouchEventType eventType)
         }
         else if(tag == 104)//继续
         {
-            CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
-            this->resume();
-            _pauseBtn->setTouchEnabled(true);
-            auto layer = this->getChildByName("PauseLayer");
-            if (layer)
-            {
-                layer->removeFromParentAndCleanup(true);
-            }
-            for (Sprite * enemy : _enemy)
-            {
-                enemy->resume();
-            }
-            for (Sprite * life : _life)
-            {
-                life->resume();
-            }
+            
+            this->getChildByName("PauseLayer")->getChildByTag(104)->setVisible(false);
+            auto countDown = Label::createWithSystemFont("3","Arial",140);
+            countDown->setPosition(Vec2(Director::getInstance()->getVisibleSize().width/2,Director::getInstance()->getVisibleSize().height/2));
+            countDown->setName("countDown");
+
+            countDown->runAction(Spawn::create(FadeOut::create(0.7f),ScaleTo::create(0.7f, 2), NULL));
+            this->getChildByName("PauseLayer")->addChild(countDown);
+            this->runAction(Sequence::create(DelayTime::create(0.7f),CallFunc::create([&](){
+                
+                auto countDownLabel =dynamic_cast<Label*>(this->getChildByName("PauseLayer")->getChildByName("countDown"));
+                countDownLabel->setString("2");
+                countDownLabel->stopAllActions();
+                countDownLabel->setScale(1);
+                countDownLabel->setOpacity(255);
+                countDownLabel->runAction(Spawn::create(FadeOut::create(0.7f),ScaleTo::create(0.7f, 2), NULL));
+                
+                
+            }),DelayTime::create(0.7f),CallFunc::create([&](){
+                auto countDownLabel =dynamic_cast<Label*>(this->getChildByName("PauseLayer")->getChildByName("countDown"));
+                countDownLabel->setString("1");
+                countDownLabel->setScale(1);
+                countDownLabel->setOpacity(255);
+                countDownLabel->stopAllActions();
+                countDownLabel->runAction(Spawn::create(FadeOut::create(0.7f),ScaleTo::create(0.7f, 2), NULL));
+                
+            }), DelayTime::create(0.7f),CallFunc::create([&](){
+                
+                auto countDownLabel =dynamic_cast<Label*>(this->getChildByName("PauseLayer")->getChildByName("countDown"));
+                countDownLabel->removeFromParentAndCleanup(true);
+                CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+                this->resume();
+                _pauseBtn->setTouchEnabled(true);
+                auto layer = this->getChildByName("PauseLayer");
+                if (layer)
+                {
+                    layer->removeFromParentAndCleanup(true);
+                }
+                for (Sprite * enemy : _enemy)
+                {
+                    enemy->resume();
+                }
+                for (Sprite * life : _life)
+                {
+                    life->resume();
+                }
+            }),NULL));
+            
         }
         else if(tag == 105)//暂停
         {
@@ -607,26 +653,26 @@ bool GameScene::isGameOver()
 {
     return _isGameOver;
 }
-void GameScene::setGLProgramBlur(Node * node)
-{
-//    node->set
-    Sprite * sp = dynamic_cast<Sprite*>(node);
-    GLchar * fragSource = (GLchar*) String::createWithContentsOfFile(
-                                                                     FileUtils::getInstance()->fullPathForFilename("shaders/example_Blur.fsh").c_str())->getCString();
-    auto program = GLProgram::createWithByteArrays(ccPositionTextureColor_noMVP_vert, fragSource);
-    
-    auto glProgramState = GLProgramState::getOrCreateWithGLProgram(program);
-    sp->setGLProgramState(glProgramState);
-    
-    auto size = sp->getTexture()->getContentSizeInPixels();
-    sp->getGLProgramState()->setUniformVec2("resolution", size);
-    sp->getGLProgramState()->setUniformFloat("blurRadius", 0);
-    sp->getGLProgramState()->setUniformFloat("sampleNum",0);
-}
-void GameScene::setGLProgramBack(Node * node)
-{
-    node->setGLProgramState(_gLProgramState);
-}
+//void GameScene::setGLProgramBlur(Node * node)
+//{
+////    node->set
+//    Sprite * sp = dynamic_cast<Sprite*>(node);
+//    GLchar * fragSource = (GLchar*) String::createWithContentsOfFile(
+//                                                                     FileUtils::getInstance()->fullPathForFilename("shaders/example_Blur.fsh").c_str())->getCString();
+//    auto program = GLProgram::createWithByteArrays(ccPositionTextureColor_noMVP_vert, fragSource);
+//    
+//    auto glProgramState = GLProgramState::getOrCreateWithGLProgram(program);
+//    sp->setGLProgramState(glProgramState);
+//    
+//    auto size = sp->getTexture()->getContentSizeInPixels();
+//    sp->getGLProgramState()->setUniformVec2("resolution", size);
+//    sp->getGLProgramState()->setUniformFloat("blurRadius", 0);
+//    sp->getGLProgramState()->setUniformFloat("sampleNum",0);
+//}
+//void GameScene::setGLProgramBack(Node * node)
+//{
+//    node->setGLProgramState(_gLProgramState);
+//}
 void GameScene::gameOver()
 {
     _isGameOver = true;
@@ -638,8 +684,12 @@ void GameScene::gameOver()
     bg->runAction(Spawn::create(easeOutAction,easeBigAction, NULL));
     bg->runAction(Sequence::create(DelayTime::create(1.5),CallFunc::create(CC_CALLBACK_0(GameScene::createFuncCallback, this)),NULL));
     _timeLabel->runAction(FadeOut::create(0.8));
-    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/die.mp3");//gamestart.wav
-    CCLOG("GameOver");
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) //WP8平台不支持mp3格式，使用wav，分平台编译
+    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/die.wav");
+#else
+    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("music/die.mp3");
+#endif
+    
     //GameScene::blurSchluder
 //    for (auto bird:_birds)
 //    {
